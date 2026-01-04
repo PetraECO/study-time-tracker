@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #1e3b71;
+            background: linear-gradient(135deg, #205a31 0%, #2a7040 100%);
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -258,7 +258,7 @@
         .section-divider {
             margin: 30px 0 20px 0;
             padding-bottom: 10px;
-            border-bottom: 2px solid #edeefd;
+            border-bottom: 2px solid #1e3c72;
         }
 
         .hidden {
@@ -369,8 +369,17 @@
 
         <!-- Progress Tab -->
         <div id="progress" class="tab-content">
-            <h2 style="color: #1e3c72; margin-bottom: 20px;">Weekly Progress</h2>
-            <div class="progress-bars" id="progressBars"></div>
+            <h2 style="color: #1e3c72; margin-bottom: 20px;">Progress Tracking</h2>
+            
+            <div class="section-divider">
+                <h3 style="color: #2a5298;">📊 Weekly Progress</h3>
+            </div>
+            <div class="progress-bars" id="weeklyProgressBars"></div>
+            
+            <div class="section-divider" style="margin-top: 40px;">
+                <h3 style="color: #2a5298;">📅 Monthly Progress</h3>
+            </div>
+            <div class="progress-bars" id="monthlyProgressBars"></div>
         </div>
 
         <!-- Log Tab -->
@@ -447,6 +456,15 @@
             'Client Work': 10,
             'Writing': 3.5,
             'Documenting': 3.5
+        };
+
+        const monthlyGoals = {
+            'Back-End Engineering': 64,
+            'Python': 16,
+            'Cybersecurity': 16,
+            'Client Work': 40,
+            'Writing': 14,
+            'Documenting': 14
         };
 
         function switchTab(tabName) {
@@ -589,6 +607,11 @@
         }
 
         function updateProgress() {
+            updateWeeklyProgress();
+            updateMonthlyProgress();
+        }
+
+        function updateWeeklyProgress() {
             const sessions = JSON.parse(localStorage.getItem('sessions') || '[]');
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
@@ -605,12 +628,54 @@
                 }
             });
             
-            const progressBars = document.getElementById('progressBars');
+            const progressBars = document.getElementById('weeklyProgressBars');
             progressBars.innerHTML = '';
             
             Object.keys(weeklyGoals).forEach(subject => {
                 const goal = weeklyGoals[subject];
                 const completed = weeklyHours[subject] || 0;
+                const percentage = Math.min((completed / goal) * 100, 100);
+                
+                const item = document.createElement('div');
+                item.className = 'progress-item';
+                item.innerHTML = `
+                    <div class="progress-header">
+                        <strong>${subject}</strong>
+                        <span>${completed.toFixed(1)}h / ${goal}h</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${percentage}%">
+                            ${percentage.toFixed(0)}%
+                        </div>
+                    </div>
+                `;
+                progressBars.appendChild(item);
+            });
+        }
+
+        function updateMonthlyProgress() {
+            const sessions = JSON.parse(localStorage.getItem('sessions') || '[]');
+            const monthAgo = new Date();
+            monthAgo.setDate(monthAgo.getDate() - 30);
+            
+            const monthlyHours = {};
+            Object.keys(monthlyGoals).forEach(subject => {
+                monthlyHours[subject] = 0;
+            });
+            
+            sessions.forEach(session => {
+                const sessionDate = new Date(session.date);
+                if (sessionDate >= monthAgo && monthlyHours.hasOwnProperty(session.subject)) {
+                    monthlyHours[session.subject] += session.hours;
+                }
+            });
+            
+            const progressBars = document.getElementById('monthlyProgressBars');
+            progressBars.innerHTML = '';
+            
+            Object.keys(monthlyGoals).forEach(subject => {
+                const goal = monthlyGoals[subject];
+                const completed = monthlyHours[subject] || 0;
                 const percentage = Math.min((completed / goal) * 100, 100);
                 
                 const item = document.createElement('div');
@@ -660,7 +725,3 @@
     </script>
 </body>
 </html>
-
-
-
-
