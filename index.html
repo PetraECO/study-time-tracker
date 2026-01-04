@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #205a31 0%, #2a7040 100%);
+            background: #2b1c50;
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -216,6 +216,27 @@
             background: #e0e0e0;
             border-radius: 12px;
             overflow: hidden;
+        }
+
+        .progress-bar.monthly {
+            display: flex;
+            gap: 2px;
+            background: transparent;
+        }
+
+        .progress-bar.monthly .week-segment {
+            flex: 1;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar.monthly .week-segment .segment-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #205a31 0%, #2a7040 100%);
+            transition: width 0.3s;
         }
 
         .progress-fill {
@@ -655,18 +676,28 @@
 
         function updateMonthlyProgress() {
             const sessions = JSON.parse(localStorage.getItem('sessions') || '[]');
-            const monthAgo = new Date();
-            monthAgo.setDate(monthAgo.getDate() - 30);
+            const now = new Date();
             
             const monthlyHours = {};
+            const weeklyBreakdown = {};
+            
             Object.keys(monthlyGoals).forEach(subject => {
                 monthlyHours[subject] = 0;
+                weeklyBreakdown[subject] = [0, 0, 0, 0]; // 4 weeks
             });
             
             sessions.forEach(session => {
                 const sessionDate = new Date(session.date);
-                if (sessionDate >= monthAgo && monthlyHours.hasOwnProperty(session.subject)) {
+                const daysAgo = Math.floor((now - sessionDate) / (1000 * 60 * 60 * 24));
+                
+                if (daysAgo < 30 && monthlyHours.hasOwnProperty(session.subject)) {
                     monthlyHours[session.subject] += session.hours;
+                    
+                    // Determine which week (0-3, where 0 is most recent)
+                    const weekIndex = Math.floor(daysAgo / 7);
+                    if (weekIndex < 4) {
+                        weeklyBreakdown[session.subject][weekIndex] += session.hours;
+                    }
                 }
             });
             
@@ -677,18 +708,29 @@
                 const goal = monthlyGoals[subject];
                 const completed = monthlyHours[subject] || 0;
                 const percentage = Math.min((completed / goal) * 100, 100);
+                const weeklyGoal = goal / 4;
+                
+                // Build the 4-week segments
+                let segmentsHTML = '';
+                for (let i = 3; i >= 0; i--) { // Reverse to show oldest to newest left to right
+                    const weekHours = weeklyBreakdown[subject][i];
+                    const weekPercentage = Math.min((weekHours / weeklyGoal) * 100, 100);
+                    segmentsHTML += `
+                        <div class="week-segment">
+                            <div class="segment-fill" style="width: ${weekPercentage}%"></div>
+                        </div>
+                    `;
+                }
                 
                 const item = document.createElement('div');
                 item.className = 'progress-item';
                 item.innerHTML = `
                     <div class="progress-header">
                         <strong>${subject}</strong>
-                        <span>${completed.toFixed(1)}h / ${goal}h</span>
+                        <span>${completed.toFixed(1)}h / ${goal}h (${percentage.toFixed(0)}%)</span>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${percentage}%">
-                            ${percentage.toFixed(0)}%
-                        </div>
+                    <div class="progress-bar monthly">
+                        ${segmentsHTML}
                     </div>
                 `;
                 progressBars.appendChild(item);
