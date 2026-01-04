@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #2b1c50;
+            background: #09493b;
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -85,11 +85,37 @@
             cursor: pointer;
             transition: transform 0.2s;
             border: 2px solid #1e3c72;
+            position: relative;
         }
 
         .schedule-block:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .schedule-block .schedule-content {
+            transition: opacity 0.2s;
+        }
+
+        .schedule-block .hover-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #1e3c72;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+
+        .schedule-block:hover .schedule-content {
+            opacity: 0;
+        }
+
+        .schedule-block:hover .hover-text {
+            opacity: 1;
         }
 
         .schedule-block h3 {
@@ -279,7 +305,7 @@
         .section-divider {
             margin: 30px 0 20px 0;
             padding-bottom: 10px;
-            border-bottom: 2px solid #2b1c50;
+            border-bottom: 2px solid #1e3c72;
         }
 
         .hidden {
@@ -307,19 +333,28 @@
             </div>
             <div class="schedule-grid">
                 <div class="schedule-block" onclick="startSession('Back-End Engineering', 4)">
-                    <h3>Back-End Engineering</h3>
-                    <p>4 hours</p>
-                    <p>📅 Mon, Tue, Thu, Fri</p>
+                    <div class="schedule-content">
+                        <h3>Back-End Engineering</h3>
+                        <p>4 hours</p>
+                        <p>📅 Mon, Tue, Thu, Fri</p>
+                    </div>
+                    <div class="hover-text">Start Session</div>
                 </div>
                 <div class="schedule-block" onclick="startSession('Python', 2)">
-                    <h3>Python</h3>
-                    <p>2 hours</p>
-                    <p>📅 Tue, Thu</p>
+                    <div class="schedule-content">
+                        <h3>Python</h3>
+                        <p>2 hours</p>
+                        <p>📅 Tue, Thu</p>
+                    </div>
+                    <div class="hover-text">Start Session</div>
                 </div>
                 <div class="schedule-block" onclick="startSession('Cybersecurity', 2)">
-                    <h3>Cybersecurity</h3>
-                    <p>2 hours</p>
-                    <p>📅 Mon, Fri</p>
+                    <div class="schedule-content">
+                        <h3>Cybersecurity</h3>
+                        <p>2 hours</p>
+                        <p>📅 Mon, Fri</p>
+                    </div>
+                    <div class="hover-text">Start Session</div>
                 </div>
             </div>
 
@@ -328,9 +363,12 @@
             </div>
             <div class="schedule-grid">
                 <div class="schedule-block" onclick="startSession('Client Work', 2)">
-                    <h3>Client Work</h3>
-                    <p>2 hours daily</p>
-                    <p>🕐 Monday - Friday AM</p>
+                    <div class="schedule-content">
+                        <h3>Client Work</h3>
+                        <p>2 hours daily</p>
+                        <p>🕐 Monday - Friday AM</p>
+                    </div>
+                    <div class="hover-text">Start Session</div>
                 </div>
             </div>
 
@@ -339,14 +377,20 @@
             </div>
             <div class="schedule-grid">
                 <div class="schedule-block" onclick="startSession('Writing', 0.5)">
-                    <h3>Writing</h3>
-                    <p>30 minutes</p>
-                    <p>✍️ Daily</p>
+                    <div class="schedule-content">
+                        <h3>Writing</h3>
+                        <p>30 minutes</p>
+                        <p>✍️ Daily</p>
+                    </div>
+                    <div class="hover-text">Start Session</div>
                 </div>
                 <div class="schedule-block" onclick="startSession('Documenting', 0.5)">
-                    <h3>Documenting</h3>
-                    <p>30 minutes</p>
-                    <p>📝 Daily</p>
+                    <div class="schedule-content">
+                        <h3>Documenting</h3>
+                        <p>30 minutes</p>
+                        <p>📝 Daily</p>
+                    </div>
+                    <div class="hover-text">Start Session</div>
                 </div>
             </div>
         </div>
