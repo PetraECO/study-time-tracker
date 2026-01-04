@@ -320,6 +320,12 @@
                     <button class="btn-secondary" onclick="resetTimer()">Reset</button>
                     <button class="btn-secondary" onclick="skipPhase()">Skip Phase</button>
                 </div>
+                <div style="margin-top: 15px;">
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #1e3c72; cursor: pointer;">
+                        <input type="checkbox" id="soundToggle" checked onchange="toggleSound()" style="width: auto; cursor: pointer;">
+                        <span>Enable tick sound 🔊</span>
+                    </label>
+                </div>
             </div>
 
             <div class="session-form">
@@ -348,7 +354,7 @@
 
         <!-- Log Tab -->
         <div id="log" class="tab-content">
-            <h2 style="color: #1e3c72; margin-bottom: 20px;">Session History</h2>
+            <h2 style="color: #eeece7; margin-bottom: 20px;">Session History</h2>
             <div class="session-log" id="sessionLog"></div>
         </div>
     </div>
@@ -362,28 +368,51 @@
         let pomodorosCompleted = 0;
         let timerStartTime = null;
         let pausedTimeRemaining = null;
+        let soundEnabled = true;
+        let audioContext = null;
 
         const WORK_TIME = 40 * 60;
         const BREAK_TIME = 10 * 60;
 
-        // Create audio context for ticking sound
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
         
         function playTick() {
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            if (!soundEnabled) return;
             
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.1);
+            try {
+                initAudio();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.05);
+            } catch (e) {
+                console.log('Audio not available');
+            }
+        }
+
+        function toggleSound() {
+            soundEnabled = document.getElementById('soundToggle').checked;
+            if (soundEnabled) {
+                initAudio();
+                playTick(); // Test sound
+            }
         }
 
         const weeklyGoals = {
@@ -424,6 +453,8 @@
             btn.textContent = isRunning ? 'Pause' : 'Start';
             
             if (isRunning) {
+                // Initialize audio on first start
+                initAudio();
                 // Store the start time and initial remaining time
                 timerStartTime = Date.now();
                 pausedTimeRemaining = timeRemaining;
@@ -442,11 +473,7 @@
             timeRemaining = Math.max(0, pausedTimeRemaining - elapsed);
             
             // Play tick sound
-            try {
-                playTick();
-            } catch (e) {
-                // Silently fail if audio doesn't work
-            }
+            playTick();
             
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
