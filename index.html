@@ -200,7 +200,7 @@
         }
 
         .progress-item {
-            background: #195ce0;
+            background: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
         }
@@ -360,9 +360,31 @@
         let isRunning = false;
         let currentSubject = '';
         let pomodorosCompleted = 0;
+        let timerStartTime = null;
+        let pausedTimeRemaining = null;
 
         const WORK_TIME = 40 * 60;
         const BREAK_TIME = 10 * 60;
+
+        // Create audio context for ticking sound
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTick() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
 
         const weeklyGoals = {
             'Front-End AM': 10,
@@ -402,14 +424,29 @@
             btn.textContent = isRunning ? 'Pause' : 'Start';
             
             if (isRunning) {
+                // Store the start time and initial remaining time
+                timerStartTime = Date.now();
+                pausedTimeRemaining = timeRemaining;
                 timerInterval = setInterval(updateTimer, 1000);
             } else {
                 clearInterval(timerInterval);
+                // Calculate actual time remaining when paused
+                const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+                timeRemaining = Math.max(0, pausedTimeRemaining - elapsed);
             }
         }
 
         function updateTimer() {
-            timeRemaining--;
+            // Calculate time based on actual elapsed time since start
+            const elapsed = Math.floor((Date.now() - timerStartTime) / 1000);
+            timeRemaining = Math.max(0, pausedTimeRemaining - elapsed);
+            
+            // Play tick sound
+            try {
+                playTick();
+            } catch (e) {
+                // Silently fail if audio doesn't work
+            }
             
             if (timeRemaining <= 0) {
                 clearInterval(timerInterval);
@@ -566,7 +603,3 @@
     </script>
 </body>
 </html>
-
-
-
-
