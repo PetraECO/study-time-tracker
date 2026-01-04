@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #09493b;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -26,10 +26,10 @@
 
         h1 {
             text-align: center;
-            color: #ffd700;
+            color: #2d3748;
             margin-bottom: 30px;
             font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         .tabs {
@@ -41,9 +41,9 @@
 
         .tab {
             padding: 12px 24px;
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid #ffd700;
-            color: #ffd700;
+            background: rgba(255, 255, 255, 0.7);
+            border: 2px solid #667eea;
+            color: #667eea;
             cursor: pointer;
             border-radius: 8px;
             font-weight: bold;
@@ -51,12 +51,13 @@
         }
 
         .tab:hover {
-            background: rgba(255, 215, 0, 0.2);
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
 
         .tab.active {
-            background: #ffd700;
-            color: #1e3c72;
+            background: #667eea;
+            color: white;
         }
 
         .tab-content {
@@ -104,7 +105,7 @@
             transform: translate(-50%, -50%);
             font-size: 1.5em;
             font-weight: bold;
-            color: #1e3c72;
+            color: white;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
@@ -131,22 +132,23 @@
         .timer-container {
             text-align: center;
             padding: 40px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border-radius: 12px;
             margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
         }
 
         .timer-display {
             font-size: 4em;
             font-weight: bold;
-            color: #1e3c72;
+            color: white;
             margin: 20px 0;
             font-family: 'Courier New', monospace;
         }
 
         .timer-label {
             font-size: 1.2em;
-            color: #2a5298;
+            color: rgba(255, 255, 255, 0.95);
             margin-bottom: 10px;
         }
 
@@ -168,21 +170,25 @@
         }
 
         .btn-primary {
-            background: #1e3c72;
-            color: #ffd700;
+            background: #667eea;
+            color: white;
         }
 
         .btn-primary:hover {
-            background: #2a5298;
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         .btn-secondary {
-            background: #ffd700;
-            color: #1e3c72;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
         }
 
         .btn-secondary:hover {
-            background: #ffed4e;
+            background: #f7fafc;
+            transform: translateY(-2px);
         }
 
         .session-form {
@@ -200,15 +206,21 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #1e3c72;
+            color: #2d3748;
         }
 
         input, textarea, select {
             width: 100%;
             padding: 10px;
-            border: 2px solid #ddd;
+            border: 2px solid #e2e8f0;
             border-radius: 6px;
             font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
         }
 
         textarea {
@@ -261,13 +273,13 @@
 
         .progress-bar.monthly .week-segment .segment-fill {
             height: 100%;
-            background: linear-gradient(90deg, #205a31 0%, #2a7040 100%);
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             transition: width 0.3s;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             transition: width 0.3s;
             display: flex;
             align-items: center;
@@ -286,7 +298,7 @@
             padding: 15px;
             margin-bottom: 10px;
             border-radius: 8px;
-            border-left: 4px solid #ffd700;
+            border-left: 4px solid #667eea;
         }
 
         .log-header {
@@ -294,7 +306,7 @@
             justify-content: space-between;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #1e3c72;
+            color: #2d3748;
         }
 
         .log-notes {
@@ -305,7 +317,7 @@
         .section-divider {
             margin: 30px 0 20px 0;
             padding-bottom: 10px;
-            border-bottom: 2px solid #1e3c72;
+            border-bottom: 2px solid #cbd5e0;
         }
 
         .hidden {
@@ -326,10 +338,10 @@
 
         <!-- Schedule Tab -->
         <div id="schedule" class="tab-content active">
-            <h2 style="color: #1e3c72; margin-bottom: 20px;">Weekly Schedule</h2>
+            <h2 style="color: #2d3748; margin-bottom: 20px;">Weekly Schedule</h2>
             
             <div class="section-divider">
-                <h3 style="color: #2a5298;">📖 Courses</h3>
+                <h3 style="color: #4a5568;">📖 Courses</h3>
             </div>
             <div class="schedule-grid">
                 <div class="schedule-block" onclick="startSession('Back-End Engineering', 4)">
@@ -359,7 +371,7 @@
             </div>
 
             <div class="section-divider">
-                <h3 style="color: #2a5298;">💼 Work</h3>
+                <h3 style="color: #4a5568;">💼 Work</h3>
             </div>
             <div class="schedule-grid">
                 <div class="schedule-block" onclick="startSession('Client Work', 2)">
@@ -373,7 +385,7 @@
             </div>
 
             <div class="section-divider">
-                <h3 style="color: #2a5298;">✨ Creative</h3>
+                <h3 style="color: #4a5568;">✨ Creative</h3>
             </div>
             <div class="schedule-grid">
                 <div class="schedule-block" onclick="startSession('Writing', 0.5)">
@@ -407,7 +419,7 @@
                     <button class="btn-secondary" onclick="skipPhase()">Skip Phase</button>
                 </div>
                 <div style="margin-top: 15px;">
-                    <label style="display: flex; align-items: center; justify-content: center; gap: 8px; color: #1e3c72; cursor: pointer;">
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 8px; color: white; cursor: pointer;">
                         <input type="checkbox" id="soundToggle" checked onchange="toggleSound()" style="width: auto; cursor: pointer;">
                         <span>Enable tick sound 🔊</span>
                     </label>
@@ -415,7 +427,7 @@
             </div>
 
             <div class="session-form">
-                <h3 style="color: #1e3c72; margin-bottom: 15px;">Log This Session</h3>
+                <h3 style="color: #2d3748; margin-bottom: 15px;">Log This Session</h3>
                 <div class="form-group">
                     <label>Subject</label>
                     <input type="text" id="logSubject" readonly>
@@ -435,24 +447,24 @@
         <!-- Progress Tab -->
         <div id="progress" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: #1e3c72; margin: 0;">Progress Tracking</h2>
-                <button class="btn-secondary" onclick="resetAllData()" style="background: #dc3545; color: white;">Reset All Data</button>
+                <h2 style="color: #2d3748; margin: 0;">Progress Tracking</h2>
+                <button class="btn-secondary" onclick="resetAllData()" style="background: #f56565; color: white; border: none;">Reset All Data</button>
             </div>
             
             <div class="section-divider">
-                <h3 style="color: #2a5298;">📊 Weekly Progress</h3>
+                <h3 style="color: #4a5568;">📊 Weekly Progress</h3>
             </div>
             <div class="progress-bars" id="weeklyProgressBars"></div>
             
             <div class="section-divider" style="margin-top: 40px;">
-                <h3 style="color: #2a5298;">📅 Monthly Progress</h3>
+                <h3 style="color: #4a5568;">📅 Monthly Progress</h3>
             </div>
             <div class="progress-bars" id="monthlyProgressBars"></div>
         </div>
 
         <!-- Log Tab -->
         <div id="log" class="tab-content">
-            <h2 style="color: #1e3c72; margin-bottom: 20px;">Session History</h2>
+            <h2 style="color: #2d3748; margin-bottom: 20px;">Session History</h2>
             <div class="session-log" id="sessionLog"></div>
         </div>
     </div>
