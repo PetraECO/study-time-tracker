@@ -232,6 +232,31 @@
             margin-top: 30px;
         }
 
+        .progress-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .progress-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .progress-column {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .progress-column h3 {
+            margin-bottom: 20px;
+            color: #2d3748;
+        }
+
         .progress-bars {
             display: grid;
             gap: 20px;
@@ -275,6 +300,54 @@
             height: 100%;
             background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             transition: width 0.3s;
+        }
+
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 300px;
+            padding: 20px 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            gap: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            max-width: 80px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+            transform: translateY(-5px);
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75em;
+            color: #4a5568;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        .chart-bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #2d3748;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
         .progress-fill {
@@ -451,15 +524,17 @@
                 <button class="btn-secondary" onclick="resetAllData()" style="background: #f56565; color: white; border: none;">Reset All Data</button>
             </div>
             
-            <div class="section-divider">
-                <h3 style="color: #4a5568;">📊 Weekly Progress</h3>
+            <div class="progress-layout">
+                <div class="progress-column">
+                    <h3>📊 Weekly Progress</h3>
+                    <div class="progress-bars" id="weeklyProgressBars"></div>
+                </div>
+                
+                <div class="progress-column">
+                    <h3>📅 Monthly Overview</h3>
+                    <div class="chart-container" id="monthlyChart"></div>
+                </div>
             </div>
-            <div class="progress-bars" id="weeklyProgressBars"></div>
-            
-            <div class="section-divider" style="margin-top: 40px;">
-                <h3 style="color: #4a5568;">📅 Monthly Progress</h3>
-            </div>
-            <div class="progress-bars" id="monthlyProgressBars"></div>
         </div>
 
         <!-- Log Tab -->
@@ -738,11 +813,9 @@
             const now = new Date();
             
             const monthlyHours = {};
-            const weeklyBreakdown = {};
             
             Object.keys(monthlyGoals).forEach(subject => {
                 monthlyHours[subject] = 0;
-                weeklyBreakdown[subject] = [0, 0, 0, 0]; // 4 weeks
             });
             
             sessions.forEach(session => {
@@ -750,49 +823,37 @@
                 const daysAgo = Math.floor((now - sessionDate) / (1000 * 60 * 60 * 24));
                 
                 if (daysAgo < 30 && monthlyHours.hasOwnProperty(session.subject)) {
-                    monthlyHours[session.subject] += session.hours;
-                    
-                    // Determine which week (0-3, where 0 is most recent)
-                    const weekIndex = Math.floor(daysAgo / 7);
-                    if (weekIndex < 4) {
-                        weeklyBreakdown[session.subject][weekIndex] += session.hours;
-                    }
+                    monthlyHours[subject] += session.hours;
                 }
             });
             
-            const progressBars = document.getElementById('monthlyProgressBars');
-            progressBars.innerHTML = '';
+            const chartContainer = document.getElementById('monthlyChart');
+            chartContainer.innerHTML = '';
+            
+            // Find max hours for scaling
+            const maxHours = Math.max(...Object.values(monthlyHours), ...Object.values(monthlyGoals));
             
             Object.keys(monthlyGoals).forEach(subject => {
                 const goal = monthlyGoals[subject];
                 const completed = monthlyHours[subject] || 0;
-                const percentage = Math.min((completed / goal) * 100, 100);
-                const weeklyGoal = goal / 4;
+                const percentage = (completed / maxHours) * 100;
                 
-                // Build the 4-week segments
-                let segmentsHTML = '';
-                for (let i = 3; i >= 0; i--) { // Reverse to show oldest to newest left to right
-                    const weekHours = weeklyBreakdown[subject][i];
-                    const weekPercentage = Math.min((weekHours / weeklyGoal) * 100, 100);
-                    segmentsHTML += `
-                        <div class="week-segment">
-                            <div class="segment-fill" style="width: ${weekPercentage}%"></div>
-                        </div>
-                    `;
-                }
+                // Abbreviate long names
+                let shortName = subject;
+                if (subject === 'Back-End Engineering') shortName = 'Back-End';
+                if (subject === 'Cybersecurity') shortName = 'Security';
+                if (subject === 'Client Work') shortName = 'Client';
+                if (subject === 'Documenting') shortName = 'Docs';
                 
-                const item = document.createElement('div');
-                item.className = 'progress-item';
-                item.innerHTML = `
-                    <div class="progress-header">
-                        <strong>${subject}</strong>
-                        <span>${completed.toFixed(1)}h / ${goal}h (${percentage.toFixed(0)}%)</span>
-                    </div>
-                    <div class="progress-bar monthly">
-                        ${segmentsHTML}
-                    </div>
+                const bar = document.createElement('div');
+                bar.className = 'chart-bar';
+                bar.style.height = `${Math.max(percentage, 5)}%`;
+                bar.title = `${subject}: ${completed.toFixed(1)}h / ${goal}h`;
+                bar.innerHTML = `
+                    <div class="chart-bar-value">${completed.toFixed(1)}h</div>
+                    <div class="chart-bar-label">${shortName}</div>
                 `;
-                progressBars.appendChild(item);
+                chartContainer.appendChild(bar);
             });
         }
 
