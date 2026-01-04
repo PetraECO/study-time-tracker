@@ -389,38 +389,23 @@
             try {
                 initAudio();
                 
-                // Create a mechanical "tick" sound like a kitchen timer
-                const oscillator1 = audioContext.createOscillator();
-                const oscillator2 = audioContext.createOscillator();
+                // Create a gentle, friendly "tick" sound like a pomodoro timer
+                const oscillator = audioContext.createOscillator();
                 const gainNode = audioContext.createGain();
-                const filter = audioContext.createBiquadFilter();
                 
-                // Mix two frequencies for a more mechanical sound
-                oscillator1.connect(gainNode);
-                oscillator2.connect(gainNode);
-                gainNode.connect(filter);
-                filter.connect(audioContext.destination);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
                 
-                // High frequency click
-                oscillator1.frequency.value = 2800;
-                oscillator1.type = 'square';
+                // Soft, pleasant frequency
+                oscillator.frequency.value = 600;
+                oscillator.type = 'sine';
                 
-                // Lower frequency thump
-                oscillator2.frequency.value = 150;
-                oscillator2.type = 'triangle';
+                // Gentle volume with smooth decay
+                gainNode.gain.setValueAtTime(0.08, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
                 
-                // High-pass filter for sharper click
-                filter.type = 'highpass';
-                filter.frequency.value = 1000;
-                
-                // Sharp attack, quick decay (mechanical tick sound)
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
-                
-                oscillator1.start(audioContext.currentTime);
-                oscillator1.stop(audioContext.currentTime + 0.03);
-                oscillator2.start(audioContext.currentTime);
-                oscillator2.stop(audioContext.currentTime + 0.03);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.08);
             } catch (e) {
                 console.log('Audio not available');
             }
