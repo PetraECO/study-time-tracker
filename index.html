@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ded8ff;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
             padding: 20px;
             color: #333;
@@ -80,7 +80,7 @@
         }
 
         .schedule-block {
-            background: #edeefd;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             padding: 20px;
             border-radius: 8px;
             cursor: pointer;
@@ -103,9 +103,9 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1em;
+            font-size: 1.5em;
             font-weight: bold;
-            color: #fb7328;
+            color: white;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
@@ -189,6 +189,22 @@
         .btn-secondary:hover {
             background: #f7fafc;
             transform: translateY(-2px);
+        }
+
+        .duration-btn {
+            background: rgba(255, 255, 255, 0.3) !important;
+            color: white !important;
+            border: 2px solid white !important;
+        }
+
+        .duration-btn:hover {
+            background: rgba(255, 255, 255, 0.4) !important;
+        }
+
+        .duration-btn.active {
+            background: white !important;
+            color: #667eea !important;
+            border: 2px solid white !important;
         }
 
         .session-form {
@@ -486,6 +502,16 @@
                 <div class="timer-label" id="timerSubject">Select a session to start</div>
                 <div class="timer-display" id="timerDisplay">40:00</div>
                 <div class="timer-label" id="timerPhase">Work Time</div>
+                
+                <div style="margin: 20px 0;">
+                    <label style="color: white; margin-bottom: 10px; display: block;">Timer Duration:</label>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn-secondary duration-btn" onclick="setDuration(15)" style="padding: 8px 20px;">15 min</button>
+                        <button class="btn-secondary duration-btn active" onclick="setDuration(25)" style="padding: 8px 20px;">25 min</button>
+                        <button class="btn-secondary duration-btn" onclick="setDuration(40)" style="padding: 8px 20px;">40 min</button>
+                    </div>
+                </div>
+                
                 <div class="timer-buttons">
                     <button class="btn-primary" onclick="toggleTimer()">Start</button>
                     <button class="btn-secondary" onclick="resetTimer()">Reset</button>
@@ -565,8 +591,11 @@
         let pausedTimeRemaining = null;
         let soundEnabled = true;
         let audioContext = null;
+        let selectedDuration = 40; // Default 40 minutes
 
-        const WORK_TIME = 40 * 60;
+        const WORK_TIME_15 = 15 * 60;
+        const WORK_TIME_25 = 25 * 60;
+        const WORK_TIME_40 = 40 * 60;
         const BREAK_TIME = 10 * 60;
 
         function initAudio() {
@@ -606,6 +635,38 @@
             }
         }
 
+        function playCompletionSound() {
+            if (!soundEnabled) return;
+            
+            try {
+                initAudio();
+                
+                // Create a pleasant "ding dong" completion sound
+                const times = [0, 0.15, 0.3];
+                const frequencies = [800, 600, 400];
+                
+                times.forEach((time, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = frequencies[index];
+                    oscillator.type = 'sine';
+                    
+                    const startTime = audioContext.currentTime + time;
+                    gainNode.gain.setValueAtTime(0.2, startTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.5);
+                    
+                    oscillator.start(startTime);
+                    oscillator.stop(startTime + 0.5);
+                });
+            } catch (e) {
+                console.log('Audio not available');
+            }
+        }
+
         function toggleSound() {
             soundEnabled = document.getElementById('soundToggle').checked;
             if (soundEnabled) {
@@ -614,7 +675,35 @@
             }
         }
 
-        const weeklyGoals = {
+        function setDuration(minutes) {
+            selectedDuration = minutes;
+            
+            // Update button active state
+            document.querySelectorAll('.duration-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Reset timer to new duration if not running
+            if (!isRunning) {
+                if (isWorkPhase) {
+                    if (minutes === 15) {
+                        timeRemaining = WORK_TIME_15;
+                    } else if (minutes === 25) {
+                        timeRemaining = WORK_TIME_25;
+                    } else {
+                        timeRemaining = WORK_TIME_40;
+                    }
+                    updateTimerDisplay();
+                }
+            }
+        }
+
+        function getWorkTime() {
+            if (selectedDuration === 15) return WORK_TIME_15;
+            if (selectedDuration === 25) return WORK_TIME_25;
+            return WORK_TIME_40;
+        }
             'Back-End Engineering': 16,
             'Python': 4,
             'Cybersecurity': 4,
@@ -656,11 +745,11 @@
             
             document.getElementById('logHours').value = hours;
             
-            // Always reset to 40-minute Pomodoro
+            // Always reset to selected Pomodoro duration
             clearInterval(timerInterval);
             isRunning = false;
             isWorkPhase = true;
-            timeRemaining = WORK_TIME;
+            timeRemaining = getWorkTime();
             pomodorosCompleted = 0;
             updateTimerDisplay();
             document.querySelector('.timer-buttons button').textContent = 'Start';
@@ -714,6 +803,9 @@
                 clearInterval(timerInterval);
                 isRunning = false;
                 
+                // Play completion sound
+                playCompletionSound();
+                
                 if (isWorkPhase) {
                     pomodorosCompleted++;
                     alert('Work session complete! Time for a break! 🎉');
@@ -722,7 +814,7 @@
                 } else {
                     alert('Break complete! Ready for another session? 💪');
                     isWorkPhase = true;
-                    timeRemaining = WORK_TIME;
+                    timeRemaining = getWorkTime();
                 }
                 
                 document.querySelector('.timer-buttons button').textContent = 'Start';
@@ -759,7 +851,7 @@
                 timeRemaining = BREAK_TIME;
             } else {
                 isWorkPhase = true;
-                timeRemaining = WORK_TIME;
+                timeRemaining = getWorkTime();
             }
             
             updateTimerDisplay();
@@ -942,6 +1034,3 @@
     </script>
 </body>
 </html>
-
-
-
