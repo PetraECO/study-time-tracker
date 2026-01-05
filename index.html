@@ -503,7 +503,17 @@
                 <h3 style="color: #2d3748; margin-bottom: 15px;">Log This Session</h3>
                 <div class="form-group">
                     <label>Subject</label>
-                    <input type="text" id="logSubject" readonly>
+                    <select id="logSubject" onchange="updateSubjectField()">
+                        <option value="">Select a subject...</option>
+                        <option value="Back-End Engineering">Back-End Engineering</option>
+                        <option value="Python">Python</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
+                        <option value="Client Work">Client Work</option>
+                        <option value="Writing">Writing</option>
+                        <option value="Documenting">Documenting</option>
+                        <option value="custom">Other (type below)</option>
+                    </select>
+                    <input type="text" id="customSubject" placeholder="Type custom subject..." style="margin-top: 10px; display: none;">
                 </div>
                 <div class="form-group">
                     <label>Hours Completed</label>
@@ -639,15 +649,37 @@
         function startSession(subject, hours) {
             currentSubject = subject;
             document.getElementById('timerSubject').textContent = subject;
-            document.getElementById('logSubject').value = subject;
+            
+            // Set the dropdown to the correct subject
+            const selectElement = document.getElementById('logSubject');
+            selectElement.value = subject;
+            
             document.getElementById('logHours').value = hours;
             
-            // Timer always starts at 40 minutes for Pomodoro
+            // Always reset to 40-minute Pomodoro
+            clearInterval(timerInterval);
+            isRunning = false;
+            isWorkPhase = true;
             timeRemaining = WORK_TIME;
+            pomodorosCompleted = 0;
+            updateTimerDisplay();
+            document.querySelector('.timer-buttons button').textContent = 'Start';
             
-            resetTimer();
             switchTab('timer');
             document.querySelectorAll('.tab')[1].classList.add('active');
+        }
+
+        function updateSubjectField() {
+            const selectElement = document.getElementById('logSubject');
+            const customInput = document.getElementById('customSubject');
+            
+            if (selectElement.value === 'custom') {
+                customInput.style.display = 'block';
+                customInput.focus();
+            } else {
+                customInput.style.display = 'none';
+                customInput.value = '';
+            }
         }
 
         function toggleTimer() {
@@ -735,7 +767,16 @@
         }
 
         function saveSession() {
-            const subject = document.getElementById('logSubject').value;
+            const selectElement = document.getElementById('logSubject');
+            const customInput = document.getElementById('customSubject');
+            
+            let subject;
+            if (selectElement.value === 'custom') {
+                subject = customInput.value.trim();
+            } else {
+                subject = selectElement.value;
+            }
+            
             const hours = parseFloat(document.getElementById('logHours').value);
             const notes = document.getElementById('logNotes').value;
             
@@ -757,6 +798,8 @@
             
             alert('Session saved! 🎉');
             document.getElementById('logNotes').value = '';
+            customInput.value = '';
+            customInput.style.display = 'none';
             resetTimer();
         }
 
