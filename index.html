@@ -80,7 +80,7 @@
         }
 
         .schedule-block {
-            background: #edeefd;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             padding: 20px;
             border-radius: 8px;
             cursor: pointer;
@@ -105,7 +105,7 @@
             transform: translate(-50%, -50%);
             font-size: 1.5em;
             font-weight: bold;
-            color: #1e3c6f;
+            color: white;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
@@ -429,7 +429,7 @@
                     <div class="schedule-content">
                         <h3>Python</h3>
                         <p>2 hours</p>
-                        <p>📅 Sun, Thu</p>
+                        <p>📅 Tue, Thu</p>
                     </div>
                     <div class="hover-text">Start Session</div>
                 </div>
@@ -437,7 +437,7 @@
                     <div class="schedule-content">
                         <h3>Cybersecurity</h3>
                         <p>2 hours</p>
-                        <p>📅 Mon, Sat</p>
+                        <p>📅 Mon, Fri</p>
                     </div>
                     <div class="hover-text">Start Session</div>
                 </div>
@@ -450,7 +450,7 @@
                 <div class="schedule-block" onclick="startSession('Client Work', 2)">
                     <div class="schedule-content">
                         <h3>Client Work</h3>
-                        <p>3 hours daily</p>
+                        <p>2 hours daily</p>
                         <p>🕐 Monday - Friday AM</p>
                     </div>
                     <div class="hover-text">Start Session</div>
@@ -642,9 +642,8 @@
             document.getElementById('logSubject').value = subject;
             document.getElementById('logHours').value = hours;
             
-            // Set timer based on session length
-            const minutes = hours * 60;
-            timeRemaining = minutes * 60;
+            // Timer always starts at 40 minutes for Pomodoro
+            timeRemaining = WORK_TIME;
             
             resetTimer();
             switchTab('timer');
@@ -900,7 +899,3 @@
     </script>
 </body>
 </html>
-
-
-
-
