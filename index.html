@@ -191,22 +191,6 @@
             transform: translateY(-2px);
         }
 
-        .duration-btn {
-            background: rgba(255, 255, 255, 0.3) !important;
-            color: white !important;
-            border: 2px solid white !important;
-        }
-
-        .duration-btn:hover {
-            background: rgba(255, 255, 255, 0.4) !important;
-        }
-
-        .duration-btn.active {
-            background: white !important;
-            color: #667eea !important;
-            border: 2px solid white !important;
-        }
-
         .session-form {
             background: #f8f9fa;
             padding: 20px;
@@ -502,16 +486,6 @@
                 <div class="timer-label" id="timerSubject">Select a session to start</div>
                 <div class="timer-display" id="timerDisplay">40:00</div>
                 <div class="timer-label" id="timerPhase">Work Time</div>
-                
-                <div style="margin: 20px 0;">
-                    <label style="color: white; margin-bottom: 10px; display: block;">Timer Duration:</label>
-                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn-secondary duration-btn" onclick="setDuration(15)" style="padding: 8px 20px;">15 min</button>
-                        <button class="btn-secondary duration-btn active" onclick="setDuration(25)" style="padding: 8px 20px;">25 min</button>
-                        <button class="btn-secondary duration-btn" onclick="setDuration(40)" style="padding: 8px 20px;">40 min</button>
-                    </div>
-                </div>
-                
                 <div class="timer-buttons">
                     <button class="btn-primary" onclick="toggleTimer()">Start</button>
                     <button class="btn-secondary" onclick="resetTimer()">Reset</button>
@@ -591,11 +565,8 @@
         let pausedTimeRemaining = null;
         let soundEnabled = true;
         let audioContext = null;
-        let selectedDuration = 40; // Default 40 minutes
 
-        const WORK_TIME_15 = 15 * 60;
-        const WORK_TIME_25 = 25 * 60;
-        const WORK_TIME_40 = 40 * 60;
+        const WORK_TIME = 40 * 60;
         const BREAK_TIME = 10 * 60;
 
         function initAudio() {
@@ -675,35 +646,7 @@
             }
         }
 
-        function setDuration(minutes) {
-            selectedDuration = minutes;
-            
-            // Update button active state
-            document.querySelectorAll('.duration-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Reset timer to new duration if not running
-            if (!isRunning) {
-                if (isWorkPhase) {
-                    if (minutes === 15) {
-                        timeRemaining = WORK_TIME_15;
-                    } else if (minutes === 25) {
-                        timeRemaining = WORK_TIME_25;
-                    } else {
-                        timeRemaining = WORK_TIME_40;
-                    }
-                    updateTimerDisplay();
-                }
-            }
-        }
-
-        function getWorkTime() {
-            if (selectedDuration === 15) return WORK_TIME_15;
-            if (selectedDuration === 25) return WORK_TIME_25;
-            return WORK_TIME_40;
-        }
+        const weeklyGoals = {
             'Back-End Engineering': 16,
             'Python': 4,
             'Cybersecurity': 4,
@@ -745,11 +688,11 @@
             
             document.getElementById('logHours').value = hours;
             
-            // Always reset to selected Pomodoro duration
+            // Always reset to 40-minute Pomodoro
             clearInterval(timerInterval);
             isRunning = false;
             isWorkPhase = true;
-            timeRemaining = getWorkTime();
+            timeRemaining = WORK_TIME;
             pomodorosCompleted = 0;
             updateTimerDisplay();
             document.querySelector('.timer-buttons button').textContent = 'Start';
@@ -814,7 +757,7 @@
                 } else {
                     alert('Break complete! Ready for another session? 💪');
                     isWorkPhase = true;
-                    timeRemaining = getWorkTime();
+                    timeRemaining = WORK_TIME;
                 }
                 
                 document.querySelector('.timer-buttons button').textContent = 'Start';
