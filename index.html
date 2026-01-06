@@ -77,12 +77,12 @@
             margin-bottom: 30px;
         }
         .schedule-block {
-            background: #edeefd;
+            background: color-mix(in srgb, var(--primary) 10%, white);
             padding: 20px;
             border-radius: 8px;
             cursor: pointer;
             transition: transform 0.2s;
-            border: 2px solid #1e3c72;
+            border: 2px solid var(--primary-dark);
             position: relative;
         }
         .schedule-block:hover {
@@ -99,7 +99,7 @@
             transform: translate(-50%, -50%);
             font-size: 1em;
             font-weight: bold;
-            color: #fb7328;
+            color: var(--secondary);
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
@@ -111,11 +111,11 @@
             opacity: 1;
         }
         .schedule-block h3 {
-            color: #1e3c72;
+            color: var(--primary-dark);
             margin-bottom: 8px;
         }
         .schedule-block p {
-            color: #2a5298;
+            color: var(--primary);
             font-size: 0.9em;
         }
         .schedule-block .delete-course {
